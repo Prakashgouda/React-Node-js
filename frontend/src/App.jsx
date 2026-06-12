@@ -1,8 +1,10 @@
-import './App.css';
-import AuthPage from './pages/AuthPage.jsx';
-
+import Login from './pages/UserLoginPage.jsx'
 function App() {
-  return <AuthPage />;
+  return (
+    <div>
+      <Login />
+    </div>
+  )
 }
 
-export default App;
+export default App

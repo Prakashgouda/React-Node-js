@@ -1,9 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const router = express.Router();
-const users = [];
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
@@ -18,24 +18,21 @@ router.post('/signup', async (req, res) => {
     return res.status(400).json({ message: 'Name, email, and password are required.' });
   }
 
-  const normalizedEmail = email.toLowerCase();
-  const existingUser = users.find((user) => user.email === normalizedEmail);
+  const normalizedEmail = email.toLowerCase().trim();
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     return res.status(409).json({ message: 'User already exists with that email.' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = {
-    id: Date.now().toString(),
+  const newUser = await User.create({
     name,
     email: normalizedEmail,
     password: hashedPassword,
-  };
-
-  users.push(newUser);
+  });
 
   const token = jwt.sign(
-    { id: newUser.id, email: newUser.email, name: newUser.name },
+    { id: newUser._id, email: newUser.email, name: newUser.name },
     JWT_SECRET,
     { expiresIn: '1h' }
   );
@@ -43,7 +40,7 @@ router.post('/signup', async (req, res) => {
   res.status(201).json({
     message: 'Signup successful',
     token,
-    user: { id: newUser.id, name: newUser.name, email: newUser.email },
+    user: { id: newUser._id, name: newUser.name, email: newUser.email },
   });
 });
 
@@ -54,8 +51,8 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ message: 'Email and password are required.' });
   }
 
-  const normalizedEmail = email.toLowerCase();
-  const user = users.find((item) => item.email === normalizedEmail);
+  const normalizedEmail = email.toLowerCase().trim();
+  const user = await User.findOne({ email: normalizedEmail });
   if (!user) {
     return res.status(401).json({ message: 'Invalid credentials.' });
   }
@@ -66,7 +63,7 @@ router.post('/login', async (req, res) => {
   }
 
   const token = jwt.sign(
-    { id: user.id, email: user.email, name: user.name },
+    { id: user._id, email: user.email, name: user.name },
     JWT_SECRET,
     { expiresIn: '1h' }
   );
@@ -75,7 +72,7 @@ router.post('/login', async (req, res) => {
   res.json({
     message: 'Login successful',
     token,
-    user: { id: user.id, name: user.name, email: user.email },
+    user: { id: user._id, name: user.name, email: user.email },
   });
 });
 
