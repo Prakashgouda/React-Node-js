@@ -1,6 +1,6 @@
 //UserLogin page
 import { useState } from "react";
-const UserLoginPage = () => {
+const UserLoginPage = ({ onSwitchPage }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -98,7 +98,7 @@ const UserLoginPage = () => {
         </form>
         <p className="auth-footer">
           Don&apos;t have an account?
-          <button className="auth-link" type="button">
+          <button className="auth-link" type="button" onClick={onSwitchPage}>
             Signup
           </button>
         </p>
