@@ -1,9 +1,19 @@
 //UserLogin page
 import { useState } from "react";
-const UserLoginPage = ({ onSwitchPage }) => {
+import { useDispatch } from "react-redux";
+import { loginUser } from "../store/authSlice";
+
+const UserLoginPage = ({ onSwitchPage, onSuccess, onHome }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
+  const dispatch = useDispatch();
+
+  const isFormValid =
+    email.trim() &&
+    password.trim() &&
+    password.length >= 6 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const validateEmail = (value) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,13 +60,38 @@ const UserLoginPage = ({ onSwitchPage }) => {
       return;
     }
 
-    // TODO: replace this with real login API call
-    console.log("Login submit", { email, password });
+    dispatch(loginUser({ email, password }))
+      .unwrap()
+      .then(() => {
+        if (onSuccess) onSuccess();
+      })
+      .catch((err) => {
+        const message = err || "Login failed";
+        setErrors((prev) => ({ ...prev, password: message }));
+      });
   };
 
   return (
     <main className="auth-page">
       <section className="auth-card">
+        <div style={{ marginBottom: 12 }}>
+          <button
+            className="auth-button"
+            type="button"
+            onClick={onHome}
+            style={{
+              background: "#6b7280",
+              padding: "4px 8px",
+              fontSize: "11px",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: 3,
+              width: "fit-content",
+            }}
+          >
+            ← Home
+          </button>
+        </div>
         <h1 className="auth-title">Login</h1>
 
         <p className="auth-subtitle">Welcome back. Please login to continue.</p>
@@ -92,7 +127,7 @@ const UserLoginPage = ({ onSwitchPage }) => {
             <p className="auth-error">{errors.password}</p>
           </label>
 
-          <button className="auth-button" type="submit">
+          <button className="auth-button" type="submit" disabled={!isFormValid}>
             Login
           </button>
         </form>

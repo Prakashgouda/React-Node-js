@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { signupUser } from "../store/authSlice";
 
-const UserSignupPage = ({ onSwitchPage }) => {
+const UserSignupPage = ({ onSwitchPage, onSuccess, onHome }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +13,16 @@ const UserSignupPage = ({ onSwitchPage }) => {
     password: "",
     confirmPassword: "",
   });
+  const dispatch = useDispatch();
+
+  const isFormValid =
+    name.trim() &&
+    email.trim() &&
+    password.trim() &&
+    confirmPassword.trim() &&
+    password.length >= 6 &&
+    confirmPassword === password &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const validateName = (value) => {
     if (!value) {
@@ -91,12 +103,39 @@ const UserSignupPage = ({ onSwitchPage }) => {
       return;
     }
 
-    console.log("Signup submit", { name, email, password });
+    dispatch(signupUser({ name, email, password }))
+      .unwrap()
+      .then(() => {
+        if (onSuccess) onSuccess();
+      })
+      .catch((err) => {
+        const message = err || "Signup failed";
+        // show a generic error on the password field area
+        setErrors((prev) => ({ ...prev, password: message }));
+      });
   };
 
   return (
     <main className="auth-page">
       <section className="auth-card">
+        <div style={{ marginBottom: 12 }}>
+          <button
+            className="auth-button"
+            type="button"
+            onClick={onHome}
+            style={{
+              background: "#6b7280",
+              padding: "4px 8px",
+              fontSize: "11px",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: 3,
+              width: "fit-content",
+            }}
+          >
+            ← Home
+          </button>
+        </div>
         <h1 className="auth-title">Signup</h1>
 
         <p className="auth-subtitle">Create your account to get started.</p>
@@ -162,7 +201,7 @@ const UserSignupPage = ({ onSwitchPage }) => {
             <p className="auth-error">{errors.confirmPassword}</p>
           </label>
 
-          <button className="auth-button" type="submit">
+          <button className="auth-button" type="submit" disabled={!isFormValid}>
             Signup
           </button>
         </form>

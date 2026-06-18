@@ -36,7 +36,7 @@ input {
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
   padding: 32px;
   border-radius: 24px;
   background: #ffffff;
@@ -58,12 +58,12 @@ input {
 
 .auth-form {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .auth-field {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .auth-label {
@@ -106,6 +106,16 @@ input {
   background: #4338ca;
 }
 
+.auth-button:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.auth-button:disabled:hover {
+  background: #d1d5db;
+}
+
 .auth-footer {
   margin-top: 22px;
   color: #6b7280;
@@ -126,8 +136,18 @@ input {
 
 .auth-error {
   margin: 0;
-  min-height: 1.25rem;
-  line-height: 1.25rem;
+  min-height: 1rem;
+  line-height: 1rem;
   color: #b91c1c;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+}
+
+.toast {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #bbf7d0;
+  display: inline-block;
+  margin-top: 8px;
 }
